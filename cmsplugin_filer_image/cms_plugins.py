@@ -101,11 +101,17 @@ class FilerImagePlugin(CMSPluginBase):
             return instance.image.file.get_thumbnail(self._get_thumbnail_options(context, instance))
 
     def render(self, context, instance, placeholder):
-        self.render_template = select_template((
+        template = select_template((
             'cmsplugin_filer_image/plugins/image.html',  # backwards compatibility. deprecated!
             self.TEMPLATE_NAME % instance.style,
             self.TEMPLATE_NAME % 'default')
         )
+        
+        if django.VERSION[1] >= 8:
+            self.render_template = template.template
+        else:
+            self.render_template = template
+
         options = self._get_thumbnail_options(context, instance)
         context.update({
             'instance': instance,
